@@ -1,0 +1,85 @@
+
+# Minimum number of coins need to make the certain amount
+
+//Notes
+
+
+//Recursive
+    int findLowestCoins(vector<int> &coins, int cur, int amount) {
+        if (cur >= coins.size() || amount <= 0)
+            return (amount == 0) ? 0 : INT_MAX - 1;   
+        
+        int res = -1;
+        if (coins[cur] > amount) {
+            int doNotTakeCoin = 0 + findLowestCoins(coins, cur + 1, amount - 0);
+            res = doNotTakeCoin;
+        }
+        else {
+            int takeCoin = 1 + findLowestCoins(coins, cur + 0, amount - coins[cur]);
+            int doNotTakeCoin = 0 + findLowestCoins(coins, cur + 1, amount - 0);
+            res = min(takeCoin, doNotTakeCoin);
+        }
+        return res;
+    }
+    
+    int coinChange(vector<int>& coins, int amount) {
+        int res = findLowestCoins(coins, 0, amount);
+        return (res == INT_MAX - 1 ) ? -1 : res;
+    }
+
+//Memo
+    int dp[12 + 1][10000 + 1];
+    
+    int findLowestCoins(vector<int> &coins, int cur, int amount) {
+        if (cur == coins.size() || amount <= 0)
+            return (amount == 0) ? 0 : INT_MAX - 1;   
+        
+        if (dp[cur][amount] != -1)
+            return dp[cur][amount];
+        
+        int res = -1;
+        if (coins[cur] > amount) {
+            int doNotTakeCoin = 0 + findLowestCoins(coins, cur + 1, amount - 0);
+            dp[cur][amount] = res = doNotTakeCoin;
+        }
+        else {
+            int takeCoin = 1 + findLowestCoins(coins, cur + 0, amount - coins[cur]);
+            int doNotTakeCoin = 0 + findLowestCoins(coins, cur + 1, amount - 0);
+            dp[cur][amount] = res = min(takeCoin, doNotTakeCoin);
+        }
+        return dp[cur][amount] = res;
+    }
+    
+    int coinChange(vector<int>& coins, int amount) {
+        memset(dp, -1, sizeof(dp));
+        int res = findLowestCoins(coins, 0, amount);
+        return (res == INT_MAX - 1 ) ? -1 : res;
+    }
+
+//Bottom Up Approach
+    int coinChange(vector<int>& coins, int amount) {
+        int n = coins.size();
+        
+        //vector<vector<int>>dp(n+1, vector<int>(amount+1,1e5));
+        int dp[n+1][amount+1];
+        
+        
+        for(int i=0; i<=n; i++){
+            for(int j=0; j<=amount; j++){
+                if(i==0){ 
+                    dp[i][j] = 1e5;}
+                else if(j==0){ 
+                    dp[i][j] = 0;}
+                
+                else if(coins[i-1]>j) 
+                    dp[i][j] = dp[i-1][j];
+                
+//if we are able to take current coin then we find mini. of inclusion or exclusion case
+//inclusion case - we add 1 to the dp since we use the coin and in the same level we find other coin (j-coins[i-1]) which can cover the remaining amount
+                else
+                    dp[i][j] = min(1+dp[i][j-coins[i-1]], dp[i-1][j]);
+            }
+        }
+        return dp[n][amount] > 1e4 ? -1 : dp[n][amount];
+        
+    }
