@@ -1,0 +1,70 @@
+
+
+#include<bits/stdc++.h>
+using namespace std;
+
+//Recursion
+string X, Y;
+ 
+// Returns length of function f
+// or longest common substring
+// of X[0..m-1] and Y[0..n-1]
+int lcs(int i, int j, int count)
+{
+ 
+    if (i == 0 || j == 0)
+        return count;
+ 
+    if (X[i - 1] == Y[j - 1]) {
+        count = lcs(i - 1, j - 1, count + 1);
+    }
+    count = max(count,
+                max(lcs(i, j - 1, 0),
+                    lcs(i - 1, j, 0)));
+    return count;
+}
+ 
+// Driver code
+int main()
+{
+    int n, m;
+ 
+    X = "abcdxyz";
+    Y = "xyzabcd";
+ 
+    n = X.size();
+    m = Y.size();
+ 
+    cout << lcs(n, m, 0);
+ 
+    return 0;
+}
+
+//Tabulation
+    int longestCommonSubstr (string S1, string S2, int n, int m)
+    {
+        // your code here
+        int dp[n+1][m+1];
+        
+        for(int i=0; i<n+1; i++){
+            for(int j=0; j<m+1; j++){
+                if(i==0 || j==0){
+                    dp[i][j]=0;
+                }
+            }
+        }
+        int ans = dp[0][0];
+        for(int i=1; i<n+1; i++){
+            for(int j=1; j<m+1; j++){
+                if(S1[i-1] == S2[j-1]){
+                    dp[i][j] = 1+dp[i-1][j-1];
+                    ans = max(dp[i][j], ans);
+                }
+                else{
+                    dp[i][j] = 0;
+                }
+            }
+        }
+        return ans;;
+    }
+
